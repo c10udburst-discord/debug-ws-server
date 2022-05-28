@@ -3,6 +3,8 @@ import readline from "readline";
 import { WebSocketServer } from "ws";
 import chalk from "chalk";
 
+const PORT = 9090
+
 let connected = false;
 const logUtils = {
     incoming: (message) => {
@@ -27,27 +29,28 @@ const logUtils = {
     }
 };
 
-const wss = new WebSocketServer({ port: 3000 });
+const wss = new WebSocketServer({ port: PORT });
 
 wss.on("connection", async (ws) => {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
     });
+    ws.send("(()=>{window.al=window.aliu=window.aliucord=globalThis._globals.aliucord})()") 
     ws.on("message", data => {
         const parsed = JSON.parse(data.toString());
         switch (parsed.level) {
             case 0:
-                logUtils.info(`${chalk.bold("T:")} ` + parsed.message);
+                logUtils.info(chalk.bold(parsed.message));
                 break;
             case 1:
-                logUtils.info(`${chalk.greenBright("I:")} ` + parsed.message);
+                logUtils.info(chalk.greenBright(parsed.message));
                 break;
             case 2:
-                logUtils.info(`${chalk.yellow("W:")} ` + parsed.message);
+                logUtils.info(chalk.yellow(parsed.message));
                 break;
             case 3:
-                logUtils.info(`${chalk.redBright("E:")} ` + parsed.message);
+                logUtils.info(chalk.redBright(parsed.message));
                 break;
         }
     });
@@ -80,7 +83,7 @@ wss.on("connection", async (ws) => {
     }
 });
 
-spawn("adb", ["reverse", "tcp:3000", "tcp:3000"], { stdio: "ignore" }).on("exit", (code) => {
-    if (code !== 0) logUtils.error(`Port forwarding port 3000 with adb exited with code ${code}, aliucord may not load`);
-    else logUtils.success("Successfully forwarded port 3000 to phone with adb");
+spawn("adb", ["reverse", `tcp:${PORT}`, `tcp:${PORT}`], { stdio: "ignore" }).on("exit", (code) => {
+    if (code !== 0) logUtils.error(`Port forwarding port ${PORT} with adb exited with code ${code}, aliucord may not load`);
+    else logUtils.success(`Successfully forwarded port ${PORT} to phone with adb`);
 });
