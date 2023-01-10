@@ -3,7 +3,7 @@ import readline from "readline";
 import { WebSocketServer } from "ws";
 import chalk from "chalk";
 
-const PORT = 9090
+const PORT = 3000
 
 let connected = false;
 const logUtils = {
